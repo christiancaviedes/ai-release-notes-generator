@@ -1,0 +1,75 @@
+# AI Release Notes Generator Configuration
+# Copy this file to .github/release-notes-config.yml in your repository
+
+# Sections to include in release notes (in order)
+sections:
+  - breaking_changes
+  - features
+  - fixes
+  - performance
+  - documentation
+  - dependencies
+  - other
+
+# Writing tone for Claude AI
+# Options: professional, casual, technical
+tone: professional
+
+# Output destinations
+outputs:
+  github: true
+  slack: false
+  notion: false
+
+# Label to category mappings
+# PRs with these labels will be grouped into their respective categories
+labels:
+  breaking_changes:
+    - breaking
+    - breaking-change
+    - major
+    - "⚠️ breaking"
+
+  features:
+    - feature
+    - enhancement
+    - feat
+    - new
+    - "✨ feature"
+
+  fixes:
+    - bug
+    - fix
+    - bugfix
+    - patch
+    - "🐛 bug"
+
+  performance:
+    - performance
+    - perf
+    - optimization
+    - speed
+    - "⚡ performance"
+
+  documentation:
+    - documentation
+    - docs
+    - doc
+    - "📚 docs"
+
+  dependencies:
+    - dependencies
+    - deps
+    - dependency
+    - "📦 dependencies"
+
+# Include contributor list at the end
+include_contributors: true
+
+# Maximum number of PRs to include (to avoid hitting API limits)
+max_prs: 100
+
+# Custom prompt additions (appended to the default prompt)
+# custom_instructions: |
+#   Focus on user-facing changes
+#   Use present tense verbs

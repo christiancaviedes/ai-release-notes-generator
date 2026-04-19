@@ -1,0 +1,45 @@
+{
+  "name": "ai-release-notes-generator",
+  "version": "1.0.0",
+  "description": "GitHub Action that generates polished release notes from merged PRs using Claude AI",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test src/**/*.test.js",
+    "test:sample": "node src/index.js --sample",
+    "lint": "eslint src/",
+    "format": "prettier --write src/"
+  },
+  "keywords": [
+    "github-action",
+    "release-notes",
+    "changelog",
+    "claude",
+    "ai",
+    "automation"
+  ],
+  "author": "Christian Caviedes <christiancaviedes@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/christiancaviedes/ai-release-notes-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/christiancaviedes/ai-release-notes-generator/issues"
+  },
+  "homepage": "https://github.com/christiancaviedes/ai-release-notes-generator#readme",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@octokit/rest": "^21.0.0",
+    "axios": "^1.7.0",
+    "yaml": "^2.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "prettier": "^3.2.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

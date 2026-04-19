@@ -1,0 +1,135 @@
+name: Generate Release Notes
+
+on:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag (e.g., v1.2.0)'
+        required: false
+        type: string
+      since_tag:
+        description: 'Include PRs since this tag'
+        required: false
+        type: string
+      output_targets:
+        description: 'Output targets (comma-separated: github,slack,notion)'
+        required: false
+        default: 'github'
+        type: string
+      ai_tone:
+        description: 'Writing tone for release notes'
+        required: false
+        default: 'professional'
+        type: choice
+        options:
+          - professional
+          - casual
+          - technical
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  generate-release-notes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Determine release tags
+        id: tags
+        run: |
+          if [ -n "${{ inputs.release_tag }}" ]; then
+            RELEASE_TAG="${{ inputs.release_tag }}"
+          elif [ "${{ github.event_name }}" = "release" ]; then
+            RELEASE_TAG="${{ github.event.release.tag_name }}"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            RELEASE_TAG="${GITHUB_REF#refs/tags/}"
+          else
+            RELEASE_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          fi
+
+          if [ -n "${{ inputs.since_tag }}" ]; then
+            SINCE_TAG="${{ inputs.since_tag }}"
+          else
+            SINCE_TAG=$(git describe --tags --abbrev=0 "${RELEASE_TAG}^" 2>/dev/null || echo "")
+          fi
+
+          echo "release_tag=${RELEASE_TAG}" >> $GITHUB_OUTPUT
+          echo "since_tag=${SINCE_TAG}" >> $GITHUB_OUTPUT
+          echo "Release tag: ${RELEASE_TAG}"
+          echo "Since tag: ${SINCE_TAG}"
+
+      - name: Generate release notes
+        id: generate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          RELEASE_TAG: ${{ steps.tags.outputs.release_tag }}
+          SINCE_TAG: ${{ steps.tags.outputs.since_tag }}
+          OUTPUT_TARGETS: ${{ inputs.output_targets || 'github' }}
+          AI_TONE: ${{ inputs.ai_tone || 'professional' }}
+        run: |
+          node src/index.js
+
+          # Read generated notes for output
+          if [ -f "release-notes.md" ]; then
+            {
+              echo 'notes<<EOF'
+              cat release-notes.md
+              echo 'EOF'
+            } >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update GitHub Release
+        if: github.event_name == 'release' || github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f "release-notes.md" ]; then
+            gh release edit "${{ steps.tags.outputs.release_tag }}" \
+              --notes-file release-notes.md \
+              2>/dev/null || \
+            gh release create "${{ steps.tags.outputs.release_tag }}" \
+              --notes-file release-notes.md \
+              --title "${{ steps.tags.outputs.release_tag }}"
+          fi
+
+      - name: Upload release notes artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: release-notes.md
+          if-no-files-found: warn
+
+      - name: Summary
+        run: |
+          echo "## Release Notes Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** ${{ steps.tags.outputs.release_tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Since:** ${{ steps.tags.outputs.since_tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f "release-notes.md" ]; then
+            cat release-notes.md >> $GITHUB_STEP_SUMMARY
+          fi

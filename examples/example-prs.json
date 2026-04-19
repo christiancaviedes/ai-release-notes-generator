@@ -1,0 +1,74 @@
+[
+  {
+    "number": 142,
+    "title": "Add dark mode support with system preference detection",
+    "body": "Implements automatic dark mode that follows system preferences. Users can also manually toggle between light and dark themes via the settings panel.\n\n## Changes\n- Added CSS variables for theme colors\n- Implemented system preference detection using prefers-color-scheme\n- Added theme toggle component\n- Persists user preference to localStorage",
+    "author": "sarahdev",
+    "labels": ["feature", "ui"],
+    "mergedAt": "2026-04-15T14:30:00Z",
+    "url": "https://github.com/example/repo/pull/142"
+  },
+  {
+    "number": 138,
+    "title": "Fix memory leak in WebSocket connection handler",
+    "body": "Resolves the out-of-memory issues reported in #134. The WebSocket handler was not properly cleaning up event listeners when connections closed, leading to memory accumulation over time.\n\n## Root Cause\nEvent listeners were being added on each reconnect but never removed.\n\n## Fix\nImplemented proper cleanup in the disconnect handler.",
+    "author": "mikefixer",
+    "labels": ["bug", "critical"],
+    "mergedAt": "2026-04-14T09:15:00Z",
+    "url": "https://github.com/example/repo/pull/138"
+  },
+  {
+    "number": 145,
+    "title": "Upgrade to Node.js 20 LTS",
+    "body": "Bumps Node.js from 18.x to 20.x LTS.\n\n## Benefits\n- Improved performance\n- Native fetch API\n- Better ESM support\n- Security updates",
+    "author": "dependabot[bot]",
+    "labels": ["dependencies"],
+    "mergedAt": "2026-04-16T11:00:00Z",
+    "url": "https://github.com/example/repo/pull/145"
+  },
+  {
+    "number": 141,
+    "title": "Add rate limiting to authentication endpoints",
+    "body": "Implements rate limiting on login and registration endpoints to prevent brute force attacks.\n\n## Configuration\n- 5 attempts per minute for login\n- 3 attempts per minute for registration\n- Configurable via environment variables",
+    "author": "securitypro",
+    "labels": ["feature", "security"],
+    "mergedAt": "2026-04-13T16:45:00Z",
+    "url": "https://github.com/example/repo/pull/141"
+  },
+  {
+    "number": 139,
+    "title": "Optimize database queries for dashboard loading",
+    "body": "Reduces dashboard load time by 60% through query optimization.\n\n## Changes\n- Added compound indexes\n- Implemented query batching\n- Reduced N+1 queries in user list",
+    "author": "perfguru",
+    "labels": ["performance"],
+    "mergedAt": "2026-04-12T08:30:00Z",
+    "url": "https://github.com/example/repo/pull/139"
+  },
+  {
+    "number": 136,
+    "title": "BREAKING: Rename `userId` to `user_id` in API responses",
+    "body": "Standardizes API response field names to use snake_case consistently.\n\n## Migration\nUpdate any client code that references `userId` to use `user_id` instead.\n\n## Affected Endpoints\n- GET /api/users\n- GET /api/users/:id\n- POST /api/users",
+    "author": "apilead",
+    "labels": ["breaking-change", "api"],
+    "mergedAt": "2026-04-11T13:20:00Z",
+    "url": "https://github.com/example/repo/pull/136"
+  },
+  {
+    "number": 143,
+    "title": "Fix incorrect timezone handling in event scheduler",
+    "body": "Events were being scheduled in UTC instead of the user's local timezone. This caused confusion for users in non-UTC timezones.",
+    "author": "mikefixer",
+    "labels": ["bug"],
+    "mergedAt": "2026-04-15T17:00:00Z",
+    "url": "https://github.com/example/repo/pull/143"
+  },
+  {
+    "number": 140,
+    "title": "Add API documentation for webhook endpoints",
+    "body": "Documents all webhook-related endpoints including payload formats, authentication, and retry behavior.",
+    "author": "docwriter",
+    "labels": ["documentation"],
+    "mergedAt": "2026-04-12T14:00:00Z",
+    "url": "https://github.com/example/repo/pull/140"
+  }
+]
